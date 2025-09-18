@@ -1,0 +1,31 @@
+// <!-- the Contract for the Billing Service -->
+
+// just describes a version of ProtoBuf
+syntax = "proto3";
+
+// split the generated code into multiple files
+option java_multiple_files = true;
+
+// the package name for the generated Java classes
+option java_package = "billing";
+
+// the service name
+service BillingService {
+  // the method name
+  rpc CreateBillingAccount (BillingRequest) returns (BillingResponse);
+}
+
+// the request message
+message BillingRequest {
+  // attributes
+  string patientId = 1; // the field number is used to identify the field in the protocol buffer (used to serialize and deserialize the message)
+  string name = 2;
+  string email = 3;
+  double initialAmount = 4;
+}
+
+// the response message
+message BillingResponse {
+  string accountId = 1;
+  string status = 2;
+}

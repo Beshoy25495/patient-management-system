@@ -1,0 +1,6 @@
+### GET gateway health check
+#GET http://localhost:4005/gateway/actuator/health
+GET http://api-gateway:4005/gateway/actuator/health
+Content-Type: application/json
+
+###

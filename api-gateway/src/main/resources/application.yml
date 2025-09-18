@@ -1,0 +1,83 @@
+logging:
+  level:
+    org.springframework.boot.actuate: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+
+
+springdoc:
+  swagger-ui:
+    path: /gateway/swagger-ui.html
+    config-url: /gateway/patient/v3/api-docs/swagger-config
+    url: /gateway/patient/v3/api-docs
+
+
+
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info
+
+server:
+  port: 4005 # Gateway listens on port 4005
+
+
+
+spring:
+  application:
+    name: api-gateway
+  webflux:
+    base-path: /gateway
+  cloud:
+    gateway:
+      routes:
+
+        # Route for /patients/** to patient-service
+        - id: patient-service-route
+          #          uri: http://localhost:4000
+          uri: http://patient-service:4000
+          #          uri: lb://patient-service
+          predicates:
+            - Path=/patient/**
+          filters:
+            - StripPrefix=1   # The StripPrefix filter in Spring Cloud Gateway removes n segments from the beginning of the request path before forwarding it to the backend service.
+
+
+        # Route for /api/docs/patient/** to patient-service /v3/api-docs
+        - id: api-docs-patient-route
+          uri: http://patient-service:4000
+          predicates:
+            - Path=/v3/api-docs/**
+          filters:
+            - RewritePath=/v3/api-docs(?<segment>/?.*), /v3/api-docs${segment}
+
+
+        # Route for /billing/** to billing-service
+        - id: billing-service-route
+          uri: http://billing-service:4001
+          #          uri: lb://billing-service
+          predicates:
+            - Path=/billing/**
+          filters:
+            - StripPrefix=0
+
+
+        # Route for /notification/** to notification-service
+        - id: notification-service-route
+          uri: http://notification-service:4002
+          #          uri: lb://notification-service
+          predicates:
+            - Path=/notification/**
+          filters:
+            - StripPrefix=0
+
+
+        # Route for /analytics/** to analytics-service
+        - id: analytics-service-route
+          uri: http://analytics-service:4003
+          #          uri: lb://analytics-service
+          predicates:
+            - Path=/analytics/**
+          filters:
+            - StripPrefix=0

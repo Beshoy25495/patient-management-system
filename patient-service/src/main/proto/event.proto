@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package events;
+option java_multiple_files = true;
+
+import "google/protobuf/any.proto";
+
+// A generic Kafka event wrapper that can hold any payload
+message GenericEvent {
+  string eventId = 1;        // Unique ID for tracing
+  string eventType = 2;      // The type of event, e.g., "PatientCreated", "OrderPlaced"
+  int64 timestamp = 3;       // Unix timestamp in milliseconds
+
+  google.protobuf.Any payload = 4; // The generic payload (acts like <T>)
+}
