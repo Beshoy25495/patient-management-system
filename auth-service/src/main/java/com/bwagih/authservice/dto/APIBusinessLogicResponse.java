@@ -1,6 +1,6 @@
-package com.bwagih.patientservice.dto;
+package com.bwagih.authservice.dto;
 
-import com.bwagih.patientservice.dto.enums.APIBusinessLogicResponseStatus;
+import com.bwagih.authservice.dto.enums.APIBusinessLogicResponseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -60,6 +60,18 @@ public class APIBusinessLogicResponse<T> {
                 .replyMessage(message)
                 .status(APIBusinessLogicResponseStatus.SUCCESS)
                 .result(result)
+                .timestamp(Instant.now())
+                .build();
+    }
+
+    /**
+     * Create a success response with custom code and message without result
+     */
+    public static <T> APIBusinessLogicResponse<T> success(String replyCode, String message) {
+        return APIBusinessLogicResponse.<T>builder()
+                .replyCode(replyCode)
+                .replyMessage(message)
+                .status(APIBusinessLogicResponseStatus.SUCCESS)
                 .timestamp(Instant.now())
                 .build();
     }

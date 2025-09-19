@@ -1,0 +1,7 @@
+### GET request to validate Token
+#GET http://localhost:4006/auth/validate
+GET http://localhost:4005/gateway/auth/validate
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+###

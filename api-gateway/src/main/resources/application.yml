@@ -27,57 +27,84 @@ server:
 spring:
   application:
     name: api-gateway
+  main:
+    web-application-type: reactive
   webflux:
     base-path: /gateway
   cloud:
     gateway:
-      routes:
+      server:
+        webflux:
+          routes:
 
-        # Route for /patients/** to patient-service
-        - id: patient-service-route
-          #          uri: http://localhost:4000
-          uri: http://patient-service:4000
-          #          uri: lb://patient-service
-          predicates:
-            - Path=/patient/**
-          filters:
-            - StripPrefix=1   # The StripPrefix filter in Spring Cloud Gateway removes n segments from the beginning of the request path before forwarding it to the backend service.
+            # Route for /auth/** to patient-service
+            - id: auth-service-route
+              #          uri: http://localhost:4006
+              uri: http://auth-service:4006
+              #          uri: lb://patient-service
+              predicates:
+                - Path=/auth/**
+              filters:
+                - StripPrefix=1   # The StripPrefix filter in Spring Cloud Gateway removes n segments from the beginning of the request path before forwarding it to the backend service.
 
-
-        # Route for /api/docs/patient/** to patient-service /v3/api-docs
-        - id: api-docs-patient-route
-          uri: http://patient-service:4000
-          predicates:
-            - Path=/v3/api-docs/**
-          filters:
-            - RewritePath=/v3/api-docs(?<segment>/?.*), /v3/api-docs${segment}
-
-
-        # Route for /billing/** to billing-service
-        - id: billing-service-route
-          uri: http://billing-service:4001
-          #          uri: lb://billing-service
-          predicates:
-            - Path=/billing/**
-          filters:
-            - StripPrefix=0
+            # Route for /api/docs/auth/** to auth-service /v3/api-docs
+            - id: api-docs-auth-route
+              uri: http://auth-service:4006
+              predicates:
+                - Path=/api-docs/auth
+              filters:
+                - RewritePath=/api-docs/auth,/v3/api-docs
 
 
-        # Route for /notification/** to notification-service
-        - id: notification-service-route
-          uri: http://notification-service:4002
-          #          uri: lb://notification-service
-          predicates:
-            - Path=/notification/**
-          filters:
-            - StripPrefix=0
+            # Route for /patients/** to patient-service
+            - id: patient-service-route
+              #          uri: http://localhost:4000
+              uri: http://patient-service:4000
+              #          uri: lb://patient-service
+              predicates:
+                - Path=/patient/**
+              filters:
+                - StripPrefix=1
+                - JwtValidation  # JwtValidationGatewayFilterFactory class is used to validate the JWT token, the name of the filter is the class name without the GatewayFilterFactory suffix, if the token is invalid, the request is rejected with a 401 Unauthorized status code.
 
 
-        # Route for /analytics/** to analytics-service
-        - id: analytics-service-route
-          uri: http://analytics-service:4003
-          #          uri: lb://analytics-service
-          predicates:
-            - Path=/analytics/**
-          filters:
-            - StripPrefix=0
+            # Route for /api/docs/patient/** to patient-service /v3/api-docs
+            - id: api-docs-patient-route
+              uri: http://patient-service:4000
+              predicates:
+                - Path=/v3/api-docs/**
+              filters:
+                - RewritePath=/v3/api-docs(?<segment>/?.*), /v3/api-docs${segment}
+
+
+            # Route for /billing/** to billing-service
+            - id: billing-service-route
+              uri: http://billing-service:4001
+              #          uri: lb://billing-service
+              predicates:
+                - Path=/billing/**
+              filters:
+                - StripPrefix=1
+                - JwtValidation
+
+
+            # Route for /notification/** to notification-service
+            - id: notification-service-route
+              uri: http://notification-service:4002
+              #          uri: lb://notification-service
+              predicates:
+                - Path=/notification/**
+              filters:
+                - StripPrefix=1
+                - JwtValidation
+
+
+            # Route for /analytics/** to analytics-service
+            - id: analytics-service-route
+              uri: http://analytics-service:4003
+              #          uri: lb://analytics-service
+              predicates:
+                - Path=/analytics/**
+              filters:
+                - StripPrefix=1
+                - JwtValidation
